@@ -1,5 +1,5 @@
-Lab Docker Networking 
-Task 1: Create a new docker bridge and check connectivity between containers of same bridge
+## Lab Docker Networking 
+### Task 1: Create a new docker bridge and check connectivity between containers of same bridge
 1.	Check the networks available in docker host by ```docker network ls``` command, it displays the default bridge, host and none networks
 ```
 docker network ls
@@ -48,106 +48,98 @@ ip addr
 ping -c 5 ct-c1
 ```
 13.	Press ‘control+p+q’ to detach the container and continue it to run in background
-## Task 2: Create a new docker bridge and check connectivity between containers of different bridges
+### Task 2: Create a new docker bridge and check connectivity between containers of different bridges
 1.	Create a second bridge network named ct-bridge2 with the docker network create command
-
- 
-
- 
-
+```
+docker network create --driver bridge ct-bridge2
+```
 2.	Create two containers with the name ct-c3 and ct-c4 with busybox image in ct-bridge2 bridge network by the given commands. Press ‘control+p+q’ to detach the container and to switch to docker host shell
-
- 
-
+```
+docker run -it --network ct-bridge2 --name=ct-c3 busybox
+```
+Press Ctrl+P+Q, to switch back to Host
+```
+docker run -it --network ct-bridge2 --name=ct-c4 busybox 
+```
+Press Ctrl+P+Q, to switch back to Host
 3.	Attach to the shell of ct-c4 container by the docker attach command
-
- 
-
+```
+docker attach ct-c4
+```
 4.	Ping the ct-c3 container in the same bridge from ct-c4 container using container name and verify that ping gets a reply as they are on same bridge network
- 
- 
-              
-               
+ ```
+ ping -c 5 ct-c3
+ ```
+ ```
+ ip addr
+ ```          
+         
 5.	Ping the ct-c1 container and ct-c2 container in the different bridge from ct-c4 container using container name and verify that ping fails to resolve the container names and shows error name or service unknown, hence proves service discovery using container names between docker bridge networks are not possible, hence bridge networks provides complete network isolation for containers
-
- 
-
- 
-
-Task 3: Using ‘Docker network connect’ command create a successful connection between containers of different bridges
-
+```
+ping -c 5 ct-c1
+ping -c 5 ct-c2
+```
+Press Ctrl+P+Q, to switch back to Host
+### Task 3: Using ‘Docker network connect’ command create a successful connection between containers of different bridges
 1.	Use the network ls command as shown below to see all networks 
-
- 
-
-             
-
+```
+docker network ls
+```           
 2.	Use the docker network connect command to connect the container ct-c1 to ct-bridge2 network
-
- 
-
- 
-
+```
+docker network connect ct-bridge2 ct-c1
+```
 3.	Use the docker network inspect command to verify the bridge network to have the container which we configured in step 2.
-
- 
-
- 
-
- 
-
-
+```
+docker network inspect ct-bridge2
+```
 4.	Since ct-c4 container is already connected to ct-bridge2, there is no need to run a command trying to connect to it; and it is already verified in step 2 above.
 
 5.	Login to ct-c1 container using docker attach command and ping ct-c4 container. Also, use ip addr command to verify the network interfaces associated with ct-c1 container.
-
- 
-
-
-
- 
-
+```
+docker attach ct-c1
+```
+```
+ping -c 5 ct-c4
+```
+```
+ip addr
+```
 
 6.	Check the routes configured in ct-c1 container using the ip route command
-
- 
-
-               
-Task 4: Launch a container to host network
+```
+ip route
+```               
+### Task 4: Launch a container to host network
 1.	Press ‘control+p+q’ to detach the container and continue it to run in background
 
 2.	Use the docker run command to start a container ct-c5 with busybox image and using --network option to run it in host network
-
-              
+```
+docker run -it --network host --name=ct-c5 busybox
+```           
             
 3.	Use the command ip addr to view the network interfaces associated with ct-c5 container. Notice the eth0 interface IP address is the same as the virtual machine(host) IP address
-
- 
- 
-
- 
-
+```
+ip addr
+```
+```
+ifconfig 
+```
+exit from the container
 4.	Use the command docker network inspect host command to verify the newly created network and the associated container ct-c5
-
- 
- 
-
- 
-            
-
-
-
-Task 5: Launch a container to none network 
+```
+docker network inspect host
+```
+      
+### Task 5: Launch a container to none network 
 1.	Use the docker run command to start a container ct-c6 with busybox image and using --network option to run it in none network
-
-             
-
+```
+docker run -it --network none --name=ct-c6 busybox             
+```
 2.	Use the command ip addr to view the network interfaces associated with ct-c6 container. Notice there are no IP addresses assigned to the container except for the loopback address 127.0.0.1
-
-             
-
- 
-
+```
+ip addr
+```             
 3.	Press ‘control+p+q’ to detach the container and continue it to run in background
 
 
